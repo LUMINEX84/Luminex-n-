@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luminex V21 - BEAST FIX</title>
+<style>
+:root{--g:#00ff88;--bg:#0a0a0a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:monospace;padding:12px}
+h1{color:var(--g);text-align:center}
+#chat{border:1px solid var(--g);border-radius:12px;padding:10px;height:65vh;overflow:auto;background:#111}
+.msg{margin:8px 0;padding:8px 10px;border-radius:8px;max-width:90%}
+.user{background:#003322;margin-left:auto}
+.bot{background:#1a1a1a;border:1px solid #333}
+input{width:100%;padding:14px;border-radius:10px;border:1px solid var(--g);background:#000;color:var(--g);font-size:16px;margin-top:10px}
+button{margin-top:8px;padding:10px 16px;border-radius:8px;border:none;background:var(--g);color:#000;font-weight:bold;width:100%}
+</style>
+</head>
+<body>
+<h1>⚡ LUMINEX V21 BEAST</h1>
+<div id="chat"></div>
+<input id="q" placeholder="Try: 100 divide by 5">
+<button onclick="ask()">ASK / CALCULATE</button>
+<script>
+function fixMathWords(s){
+  let x=s.toLowerCase();
+  x=x.replace(/divided\s*by/g,'/');
+  x=x.replace(/divide\s*by/g,'/');
+  x=x.replace(/divided/g,'/');
+  x=x.replace(/divide/g,'/');
+  x=x.replace(/multiplied\s*by/g,'*');
+  x=x.replace(/multiply\s*by/g,'*');
+  x=x.replace(/times/g,'*');
+  x=x.replace(/x/g,'*');
+  x=x.replace(/plus/g,'+');
+  x=x.replace(/minus/g,'-');
+  x=x.replace(/what is|calculate|solve|equal to|equals/g,'');
+  x=x.replace(/[^0-9+\-*/().\s]/g,' ');
+  return x.replace(/\s+/g,' ').trim();
+}
+function solveMath(raw){
+  let expr=fixMathWords(raw);
+  if(!/^[0-9+\-*/().\s]+$/.test(expr)||!expr) return null;
+  try{let r=Function('"use strict";return ('+expr+')')(); if(isFinite(r)) return {expr,r};}catch(e){}
+  return null;
+}
+const chat=document.getElementById('chat');
+function add(t,c){let d=document.createElement('div');d.className='msg '+c;d.innerHTML=t;chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
+function ask(){
+  let q=document.getElementById('q').value.trim(); if(!q) return;
+  add(q,'user'); document.getElementById('q').value='';
+  let m=solveMath(q);
+  if(m){add(`Math: ${m.expr} = <b style="color:#00ff88">${m.r}</b>`,'bot'); return;}
+  add(`BEAST: Try "100 divide by 5 plus 3" - Africa 100%!`,'bot');
+}
+add('BEAST ONLINE. Type "100 divide by 5" now works!','bot');
+</script>
+</body>
+</html>
